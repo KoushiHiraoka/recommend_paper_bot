@@ -1,17 +1,17 @@
 import os, random, requests, json, datetime
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
 YEARS    = range(datetime.date.today().year-2,
                  datetime.date.today().year)
 
+# venueの指定は, で区切る．1つでも, を最後につける必要あり
 def research_paper(keyword, venue):
     endpoint="https://api.semanticscholar.org/graph/v1/paper/search"
     fields = ('title', 'abstract', 'year', 'referenceCount', 'citationCount',
-              'venue', 'authors')
-    # venue = ('IEEE International Conference on Pervasive Computing and Communications', 'ACM SIGCHI', )
+              'venue', 'url', 'authors')
+    # venue = ('IEEE International Conference on Pervasive Computing and Communications',)
     # venue = ('Proceedings of the ACM on Interactive Mobile Wearable and Ubiquitous Technologies')
     papers = []
     for y in YEARS:
