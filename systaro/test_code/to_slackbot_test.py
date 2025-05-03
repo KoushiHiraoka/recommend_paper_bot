@@ -140,7 +140,7 @@ def check_ui():
             "text": {
                 "type": "mrkdwn",
                 "text":
-                    f"*タイトル*\n<url>\n"
+                    f"*✏️ タイトル*\n<url>\n"
                     f"*出版年*\n<year>\n"
                     f"*会議*\n<venue>\n"
                     f"*引用数*\n<citation>\n"
@@ -169,5 +169,5 @@ if __name__ == "__main__":
     # selected_paper = sp.research_paper(keyword, venue)
     # summary = gen.summarize(selected_paper)
     # print(summary)
-    post_daily_paper(keyword, venue)
-    # check_ui()
+    # post_daily_paper(keyword, venue)
+    check_ui()

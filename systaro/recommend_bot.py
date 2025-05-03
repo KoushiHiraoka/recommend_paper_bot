@@ -20,7 +20,7 @@ def post_daily_paper(keyword, venue):
 
     selected_paper = sp.research_paper(keyword, venue)
     
-    gpt_summary = gen.summarize(keyword, venue)
+    gpt_summary = gen.summarize(selected_paper)
     pop_title = gen.gen_title(selected_paper)
 
     title    = selected_paper.get("title")
@@ -56,16 +56,17 @@ def post_daily_paper(keyword, venue):
                 "emoji": True
             }
         },
+        {"type": "divider"},
         {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
                 "text":
-                    f"*タイトル*\n<{url}|{title}>\n"
-                    f"*出版年*\n{year}\n"
-                    f"*会議*\n{venue}\n"
-                    f"*引用数*\n{citation}\n"
-                    f"*著者*\n{authors}"
+                    f"*✏️ タイトル*\n<{url}|{title}>\n"
+                    f"*📅 出版年*\n{year}\n"
+                    f"*🏷️ 会議*\n{venue}\n"
+                    f"*📈 引用数*\n{citation}\n"
+                    f"*👤 著者*\n{authors}"
             }
         },
         {"type": "divider"},
@@ -73,8 +74,7 @@ def post_daily_paper(keyword, venue):
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": f"*どんな論文🧐？*\n{gpt_summary}", 
-                "emoji": True
+                "text": f"*どんな論文？🧐*\n{gpt_summary}", 
             }
         }
     ]
