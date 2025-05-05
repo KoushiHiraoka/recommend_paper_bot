@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 OPENAI   = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 def summarize(paper_info):
-    client = OpenAI()
+    client = OPENAI
     chat = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{ "role":"system",
@@ -29,7 +29,7 @@ def summarize(paper_info):
     return chat.choices[0].message.content
 
 def gen_title(paper_info):
-    client = OpenAI()
+    client = OPENAI
     chat = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{ "role":"system",
