@@ -34,11 +34,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       # .env を使う代わりに GitHub Secrets 経由で環境変数を渡す
-      - name: Export secrets
+      - name: Export API_KEY
         run: |
-          echo "SLACK_BOT_TOKEN=${{ secrets.SLACK_BOT_TOKEN }}" >> $GITHUB_ENV
-          echo "SLACK_CHANNEL=${{ secrets.SLACK_CHANNEL }}"     >> $GITHUB_ENV
-          echo "S2_API_KEY=${{ secrets.S2_API_KEY }}"           >> $GITHUB_ENV
+          echo "API_KEY=${{ secrets.API_KEY }}" >> $GITHUB_ENV
 
       - name: Run bot
         run: |
