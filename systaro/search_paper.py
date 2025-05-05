@@ -111,7 +111,7 @@ def check_research_paper(keyword, venues):
                 'fields': ','.join(fields),
                 'limit': 100,
                 # 'venue': ','.join(venue),
-                'venue': venues,
+                'venue': v,
                 'publicationDateOrYear': f"{start}:{end}"
             }
 
@@ -156,6 +156,6 @@ def check_research_paper(keyword, venues):
 if __name__ == "__main__":
     endpoint = "https://api.semanticscholar.org/graph/v1/paper/search"
     keyword =  " "
-    # venue = ('Annual IEEE International Conference on Pervasive Computing and Communications',)
-    venue =('ACM International Symposium on Wearable Computers', )
+    venue = ('Annual IEEE International Conference on Pervasive Computing and Communications',)
+    # venue =('Proceedings of the ACM on Interactive Mobile Wearable and Ubiquitous Technologies',)
     check_research_paper(keyword, venue)
