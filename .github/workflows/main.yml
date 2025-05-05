@@ -1,0 +1,45 @@
+name: post-daily-paper
+
+on:
+  schedule:
+    # ┌──────── ┬──────── ┬────────┬────────┬────────┐
+    # │ minute  │ hour    │  day   │ month  │  dow   │
+    # └──────── ┴──────── ┴────────┴────────┴────────┘
+    # 0 */3 * * *  → 0 分ジャストに 3 時間おき（UTC）
+    - cron:  '0 */3 * * *'
+
+  workflow_dispatch:      # 手動トリガーも欲しい時用（GitHub UI から Run）
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3   # 無限ループ対策
+
+    # 前のジョブが走ってる間は新しいジョブを蹴飛ばす
+    concurrency:
+      group: paper-bot
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      # .env を使う代わりに GitHub Secrets 経由で環境変数を渡す
+      - name: Export secrets
+        run: |
+          echo "SLACK_BOT_TOKEN=${{ secrets.SLACK_BOT_TOKEN }}" >> $GITHUB_ENV
+          echo "SLACK_CHANNEL=${{ secrets.SLACK_CHANNEL }}"     >> $GITHUB_ENV
+          echo "S2_API_KEY=${{ secrets.S2_API_KEY }}"           >> $GITHUB_ENV
+
+      - name: Run bot
+        run: |
+          python recommend_bot.py
