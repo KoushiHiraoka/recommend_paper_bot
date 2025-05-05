@@ -98,7 +98,7 @@ def post_daily_paper(keyword, venue):
     #     print("Failed to post to Slack:", err)
 
 if __name__ == "__main__":
-    keyword = 'Human activity recognition'
+    keyword = ' '
     venue = ('IEEE International Conference on Pervasive Computing and Communications',)
     # selected_paper = sp.research_paper(keyword, venue)
     # summary = gen.summarize(selected_paper)
