@@ -5,6 +5,7 @@ load_dotenv()
 
 YEARS    = range(datetime.date.today().year-2,
                  datetime.date.today().year)
+SS_API_KEY = os.getenv("SS_API_KEY")
 
 def pick_dummy_query(venue_name: str) -> str:
     """
@@ -35,6 +36,7 @@ def research_paper(keyword, venues):
               'venue', 'url', 'authors')
     # venue = ('IEEE International Conference on Pervasive Computing and Communications',)
     # venue = ('Proceedings of the ACM on Interactive Mobile Wearable and Ubiquitous Technologies')
+    headers    = {"x-api-key": SS_API_KEY}  
     papers = []
     total_hits = 0
     for v in venues:
@@ -59,7 +61,7 @@ def research_paper(keyword, venues):
                 'publicationDateOrYear': f"{start}:{end}"
             }
 
-            requests_paper = requests.get(url=endpoint, params=params)
+            requests_paper = requests.get(url=endpoint, params=params, headers=headers)
 
             ### 検索ヒット数チェック　
             # r_dict = json.loads(requests_paper.text)
@@ -75,7 +77,7 @@ def research_paper(keyword, venues):
 
             token = result.get('next') or result.get('token')
             while token:
-                requests_paper = requests.get(endpoint, params={**params, 'token': token})
+                requests_paper = requests.get(endpoint, params={**params, 'token': token}, headers=headers)
                 requests_paper.raise_for_status()
                 result = requests_paper.json()
                 papers.extend(result.get('data', []))
