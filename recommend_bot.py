@@ -99,7 +99,7 @@ def post_daily_paper(keyword, venue):
 
 if __name__ == "__main__":
     keyword = ' '
-    venue = ('IEEE International Conference on Pervasive Computing and Communications','Proceedings of the CHI Conference on Human Factors in Computing Systems')
+    venue = ('IEEE International Conference on Pervasive Computing and Communications',)
     # selected_paper = sp.research_paper(keyword, venue)
     # summary = gen.summarize(selected_paper)
     # print(summary)
