@@ -1,4 +1,4 @@
-import os, random, requests, json, datetime, re
+import os, random, requests, json, datetime, re, time
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -6,6 +6,17 @@ load_dotenv()
 YEARS    = range(datetime.date.today().year-2,
                  datetime.date.today().year)
 SS_API_KEY = os.getenv("SS_API_KEY")
+
+_last_call = 0.0
+def rate_limited_get(url, *, params=None, headers=None):
+    global _last_call
+    now = time.time()
+    wait = 1.0 - (now - _last_call)
+    if wait > 0:                      # 前回から 1 秒経っていなければ待機
+        time.sleep(wait)
+    resp = requests.get(url=url, params=params, headers=headers)
+    _last_call = time.time()          # 次の呼び出しまでの基準点を更新
+    return resp
 
 def pick_dummy_query(venue_name: str) -> str:
     """
@@ -61,7 +72,7 @@ def research_paper(keyword, venues):
                 'publicationDateOrYear': f"{start}:{end}"
             }
 
-            requests_paper = requests.get(url=endpoint, params=params, headers=headers)
+            requests_paper = rate_limited_get(url=endpoint, params=params, headers=headers)
 
             ### 検索ヒット数チェック　
             # r_dict = json.loads(requests_paper.text)
@@ -77,7 +88,7 @@ def research_paper(keyword, venues):
 
             token = result.get('next') or result.get('token')
             while token:
-                requests_paper = requests.get(endpoint, params={**params, 'token': token}, headers=headers)
+                requests_paper = rate_limited_get(endpoint, params={**params, 'token': token}, headers=headers)
                 requests_paper.raise_for_status()
                 result = requests_paper.json()
                 papers.extend(result.get('data', []))
