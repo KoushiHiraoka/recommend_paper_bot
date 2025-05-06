@@ -73,7 +73,9 @@ def research_paper(keyword, venues):
             }
 
             requests_paper = rate_limited_get(url=endpoint, params=params, headers=headers)
-
+            print("SS_API_KEY:", os.getenv("SS_API_KEY")[:4], "****")
+            print("Request headers:", requests_paper.request.headers)
+            print("Status:", requests_paper.status_code)
             ### 検索ヒット数チェック　
             # r_dict = json.loads(requests_paper.text)
             # total = r_dict['total']
