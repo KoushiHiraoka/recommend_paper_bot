@@ -244,10 +244,10 @@ def check_venue_name(corpus_ids):
 
 if __name__ == "__main__":
     endpoint = "https://api.semanticscholar.org/graph/v1/paper/search"
-    keyword =  "system"
+    keyword =  " "
     ## できるやつ
     # venue = ('Annual IEEE International Conference on Pervasive Computing and Communications',)
-    venue = ('Proceedings of the CHI Conference on Human Factors in Computing Systems',)
+    venue = ('',)
     # venue =('International Conference on Mobile Systems, Applications, and Services',)
     # check_research_paper(keyword, venue)
 
