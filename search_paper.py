@@ -18,6 +18,25 @@ def rate_limited_get(url, *, params=None, headers=None):
     _last_call = time.time()          # 次の呼び出しまでの基準点を更新
     return resp
 
+def get_random_paper_with_abstract(papers):
+    """
+    abstracts を持つ論文だけを抽出し、ランダムに 1 件返す。
+    abstracts がない or 空文字のみ の論文があれば除外する。
+    条件を満たす論文がなければ RuntimeError を送出。
+    """
+    # abstract が文字列かつ空でないものだけ残す
+    papers_with_valid_abstract = [
+        paper 
+        for paper in papers
+        if isinstance(paper.get('abstract'), str) and paper['abstract'].strip()
+    ]
+
+    if not papers_with_valid_abstract:
+        raise RuntimeError("有効な abstract を持つ論文が見つかりません。")
+
+    # フィルター済みリストからランダムに選択
+    return random.choice(papers_with_valid_abstract)
+
 def pick_dummy_query(venue_name: str) -> str:
     """
     venue_name の先頭に出てくる英語アルファベット連続語
@@ -43,7 +62,7 @@ def pick_dummy_query(venue_name: str) -> str:
 # venueの指定は, で区切る．1つでも, を最後につける必要あり
 def research_paper(keyword, venues):
     endpoint="https://api.semanticscholar.org/graph/v1/paper/search"
-    fields = ('title', 'abstract', 'year', 'referenceCount', 'citationCount',
+    fields = ('title', 'abstract', 'year', 'citationCount',
               'venue', 'url', 'authors')
     # venue = ('IEEE International Conference on Pervasive Computing and Communications',)
     # venue = ('Proceedings of the ACM on Interactive Mobile Wearable and Ubiquitous Technologies')
@@ -59,47 +78,53 @@ def research_paper(keyword, venues):
             dummy_query = keyword 
         
         print(dummy_query)
-        for y in YEARS:
-            start = f"{y}-01-01"
-            end   = f"{y}-12-31"
-            params = {
-                'query' : dummy_query,
-                'fields': ','.join(fields),
-                'limit': 100,
-                # 'venue': 'SIG CHI'
-                # 'venue': ','.join(venue),
-                'venue': v, 
-                'publicationDateOrYear': f"{start}:{end}"
-            }
+        start = f"{datetime.date.today().year-2}-01-01"
+        end   = f"{datetime.date.today().year}-12-31"
+        params = {
+            'query' : dummy_query,
+            'fields': ','.join(fields),
+            'limit': 100,
+            # 'venue': 'SIG CHI'
+            # 'venue': ','.join(venue),
+            'venue': v, 
+            'publicationDateOrYear': f"{start}:{end}"
+        }
 
-            requests_paper = rate_limited_get(url=endpoint, params=params, headers=headers)
-            print("SS_API_KEY:", os.getenv("SS_API_KEY")[:4], "****")
-            print("Request headers:", requests_paper.request.headers)
-            print("Status:", requests_paper.status_code)
-            ### 検索ヒット数チェック　
-            # r_dict = json.loads(requests_paper.text)
-            # total = r_dict['total']
-            # print(f'Total search result: {total}')
-            ###
-            r_dict = requests_paper.json()
-            total_hits += r_dict.get('total', 0)
+        requests_paper = rate_limited_get(url=endpoint, params=params, headers=headers)
 
+        # API Keyが通ってるかチェック
+        print("SS_API_KEY:", os.getenv("SS_API_KEY")[:4], "****")
+        print("Request headers:", requests_paper.request.headers)
+        print("Status:", requests_paper.status_code)
+
+        # ### 検索ヒット数チェック　
+        # r_dict = json.loads(requests_paper.text)
+        # total = r_dict['total']
+        # print(f'Total search result: {total}')
+        # ###
+
+        r_dict = requests_paper.json()
+        total_hits += r_dict.get('total', 0)
+
+        requests_paper.raise_for_status()
+        result = r_dict
+        papers.extend(result.get('data', []))
+
+        token = result.get('next') or result.get('token')
+        while token:
+            requests_paper = rate_limited_get(endpoint, params={**params, 'token': token}, headers=headers)
             requests_paper.raise_for_status()
-            result = r_dict
+            result = requests_paper.json()
             papers.extend(result.get('data', []))
-
             token = result.get('next') or result.get('token')
-            while token:
-                requests_paper = rate_limited_get(endpoint, params={**params, 'token': token}, headers=headers)
-                requests_paper.raise_for_status()
-                result = requests_paper.json()
-                papers.extend(result.get('data', []))
-                token = result.get('next') or result.get('token')
 
     if not papers:
         raise RuntimeError("条件に合う論文が見つかりませんでした。")  
     
-    selected_paper = random.choice(papers)
+    print(f"Total search result: {total_hits}")
+
+    # selected_paper = random.choice(papers)
+    selected_paper = get_random_paper_with_abstract(papers)
 
     # 表示
     print("— 推薦論文 —")
@@ -219,10 +244,10 @@ def check_venue_name(corpus_ids):
 
 if __name__ == "__main__":
     endpoint = "https://api.semanticscholar.org/graph/v1/paper/search"
-    keyword =  " "
+    keyword =  "system"
     ## できるやつ
-    venue = ('Annual IEEE International Conference on Pervasive Computing and Communications',)
-    # venue = ('Proceedings of the CHI Conference on Human Factors in Computing Systems',)
+    # venue = ('Annual IEEE International Conference on Pervasive Computing and Communications',)
+    venue = ('Proceedings of the CHI Conference on Human Factors in Computing Systems',)
     # venue =('International Conference on Mobile Systems, Applications, and Services',)
     # check_research_paper(keyword, venue)
 
