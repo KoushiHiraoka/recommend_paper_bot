@@ -10,7 +10,7 @@ OPENAI   = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # SLACK    = WebClient(token=os.getenv("SLACK_BOT_TOKEN"))
 
 
-SS_KEY  = os.getenv("SS_KEY")
+SS_API  = os.getenv("SS_KEY")
 YEARS    = range(datetime.date.today().year-2,
                  datetime.date.today().year)
 
@@ -127,6 +127,11 @@ def summarize():
         messages=[{"role":"user", "content":"詩を英語でなんといいますか"}]
     )
     return chat.choices[0].message.content
+
+
+def check_bulk():
+    print()
+
 
 if __name__ == "__main__":
     # paper = random_paper("CHI")        # 例：CHI

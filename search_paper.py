@@ -246,8 +246,8 @@ if __name__ == "__main__":
     endpoint = "https://api.semanticscholar.org/graph/v1/paper/search"
     keyword =  " "
     ## できるやつ
-    # venue = ('Annual IEEE International Conference on Pervasive Computing and Communications',)
-    venue = ('',)
+    venue = ('Annual IEEE International Conference on Pervasive Computing and Communications',)
+    # venue = ('IEEE Global Communications Conference',)
     # venue =('International Conference on Mobile Systems, Applications, and Services',)
     # check_research_paper(keyword, venue)
 
