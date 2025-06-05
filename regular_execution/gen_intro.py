@@ -29,11 +29,15 @@ def generate_comic(paper_info):
     image_bytes = base64.b64decode(image_base64)
 
     # ファイルに書き込み
-    output_path = "sprite.png"
-    with open(output_path, "wb") as f:
-        f.write(image_bytes)
+    # output_path = "sprite.png"
+    # with open(output_path, "wb") as f:
+    #     f.write(image_bytes)
 
-    print(f"画像ファイルを保存しました: {output_path}")
+    # print(f"画像ファイルを保存しました: {output_path}")
+
+    return image_bytes
+
+
 
 def generate_sprite_sheet():
     """
