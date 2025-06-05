@@ -5,7 +5,9 @@ import time
 import tempfile
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
+from google.cloud import firestore
 from dotenv import load_dotenv
+
 load_dotenv()
 
 import gen_intro as gen 
