@@ -43,10 +43,10 @@ def post_comic(keyword, venue, year_range):
     citation = selected_paper.get("citationCount")
 
     # ローカルのファイルで試す
-    with open("sprite.png", "rb") as f:
-        comic_binary = f.read()
+    # with open("sprite.png", "rb") as f:
+    #     comic_binary = f.read()
 
-    # comic_binary = gen.generate_comic(selected_paper)
+    comic_binary = gen.generate_comic(selected_paper)
     comic_img = io.BytesIO(comic_binary)
     comic_img.seek(0)
 

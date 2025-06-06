@@ -49,7 +49,7 @@ def handle_message_events(event, say):
     # if thread_ts is None or thread_ts == ts:
     #     return
 
-    if thread_ts and text == "アブスト欲しい".lower():
+    if thread_ts and "アブスト欲しい" in text:
         # Firestore からドキュメントを読み込む
         doc_ref = posts_collection.document(thread_ts)
         doc_snapshot = doc_ref.get()
