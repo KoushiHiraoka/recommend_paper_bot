@@ -3,4 +3,4 @@
 __pycache__
 conference.txt
 test/
-.json
+service_account_key.json
