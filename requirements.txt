@@ -3,3 +3,8 @@ openai>=1.75.0
 python-dotenv>=1.1.0
 requests>=2.32.3
 slack-sdk
+flask
+pyngrok
+google-cloud-firestore>=2.21.0
+slack-bolt
+google-cloud-storage==2.19.0

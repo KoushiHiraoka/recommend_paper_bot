@@ -3,6 +3,7 @@ import datetime
 import requests
 import time
 import tempfile
+from google.cloud import firestore
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from dotenv import load_dotenv
@@ -14,9 +15,20 @@ import search_paper as sp
 CLIENT = WebClient(token=os.getenv("SLACK_BOT_TOKEN"))
 CHANNEL =os.getenv("SLACK_CHANNEL") 
 
+SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN")
+CHANNEL =os.getenv("SLACK_CHANNEL") 
+SLACK_SIGNING_SECRET = os.getenv("SLACK_SIGNING_SECRET")
+
+GOOGLE_APPLICATION_CREDENTIAL = os.getenv("FIRESTORE")
+COLLECTION_ID = os.getenv("SLACK_SIGNING_SECRET")
+db = firestore.Client()
+posts_collection = db.collection(COLLECTION_ID)
+
 def post_comic(keyword, venue, year_range):
     selected_paper = sp.research_paper(keyword, venue, year_range)
     pop_title = gen.gen_title(selected_paper)
+    gpt_summary = gen.summarize(selected_paper)
+    # gpt_summary = "testです"
 
     title    = selected_paper.get("title")
     year     = selected_paper.get("year")
@@ -31,10 +43,10 @@ def post_comic(keyword, venue, year_range):
     citation = selected_paper.get("citationCount")
 
     # ローカルのファイルで試す
-    # with open("sprite.png", "rb") as f:
-    #     comic_binary = f.read()
+    with open("sprite.png", "rb") as f:
+        comic_binary = f.read()
 
-    comic_binary = gen.generate_comic(selected_paper)
+    # comic_binary = gen.generate_comic(selected_paper)
     comic_img = io.BytesIO(comic_binary)
     comic_img.seek(0)
 
@@ -69,11 +81,25 @@ def post_comic(keyword, venue, year_range):
     ]
     print(blocks[0])
 
-    CLIENT.chat_postMessage(
+    response = CLIENT.chat_postMessage(
         channel=CHANNEL,
         blocks=blocks,
         text="今日のおすすめ論文をお届けします"  # フォールバックテキスト
     )
+
+    message_ts = response['ts']
+
+    collection_ref = db.collection(CHANNEL)  # ← ここでコレクションにチャンネルIDを指定
+    doc_ref        = collection_ref.document(message_ts) 
+    print(message_ts)
+    print(collection_ref)
+    print(doc_ref)
+
+    doc_data = {
+        "abstract": gpt_summary,
+    }
+
+    doc_ref.set(doc_data)
 
 def post_image_url(keyword, venue, year_range):
     selected_paper = sp.research_paper(keyword, venue, year_range)

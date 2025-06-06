@@ -1,0 +1,25 @@
+version: "3"
+services:
+  python:
+    build:
+      context: .
+    volumes:
+      - ./:/app
+      - ./service_account_key.json:/app/service_account_key.json:ro
+
+    ports:
+      - "8088:8088"
+    command: python ./regular_execution/response_abst.py
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: "/app/service_account_key.json"
+      ENV: "dev"
+      NGROK_AUTHTOKEN: "${NGROK_AUTHTOKEN}"
+      SLACK_CHANNEL: "${SLACK_CHANNEL}"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SS_API_KEY: "${SS_API_KEY}"
+
+
+
+
+
+

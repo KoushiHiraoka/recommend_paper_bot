@@ -13,7 +13,7 @@ load_dotenv()
 SLACK_BOT_TOKEN    = os.getenv("SLACK_BOT_TOKEN")      
 SLACK_SIGNING_SECRET = os.getenv("SLACK_SIGNING_SECRET")  
 CHANNEL            = os.getenv("SLACK_CHANNEL")              
-GOOGLE_APPLICATION_CREDENTIALS  = './service_account_key.json'
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]  = './service_account_key.json'
 
 # Firestore クライアント初期化
 db = firestore.Client()
@@ -30,17 +30,10 @@ handler = SlackRequestHandler(bolt_app)
 
 flask_app = Flask(__name__)
 
-@flask_app.route('/', methods=['POST'])
+@flask_app.route("/slack/events", methods=['POST'])
 def webhook():                     
-    signature = request.headers.get('X-Line-Signature', '')
-    body = request.get_data(as_text=True)
-    handler.handle(body, signature)
-    return 'OK'
+    return handler.handle(request)
 
-def main(request):                    
-    # Flask に処理を委譲
-    with flask_app.request_context(request.environ):
-        return flask_app.full_dispatch_request()
 
 @bolt_app.event("message")
 def handle_message_events(event, say):
@@ -48,13 +41,15 @@ def handle_message_events(event, say):
     if event.get("bot_id"):
         return
 
-    text = event.get("text", "").strip()
+    text = event.get("text", "").strip().lower()
     # (2) スレッド返信であれば、thread_ts というキーが入ってくる
     #     Slack のイベントペイロードでは “thread_ts” がルートメッセージの ts になる
     thread_ts = event.get("thread_ts")  
+    # ts = event.get("ts")
+    # if thread_ts is None or thread_ts == ts:
+    #     return
 
-    # (3) コマンドが “/アブスト” だったら抽出動作
-    if thread_ts and text == "/アブスト":
+    if thread_ts and text == "アブスト欲しい".lower():
         # Firestore からドキュメントを読み込む
         doc_ref = posts_collection.document(thread_ts)
         doc_snapshot = doc_ref.get()
